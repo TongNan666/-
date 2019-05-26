@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<!--  参考 http://www.jeasyui.net/demo/504.html -->
+<title>Custom DataGrid Pager - jQuery EasyUI Demo</title>
+<!-- 载入easyui样式及图标样式  注意该一下路径-->
+<link rel="stylesheet" type="text/css"
+	href="/shop/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="/shop/easyui/themes/icon.css">
+<!-- 载入jquery支持文件（必须写在其他js文件前）、easyui支持文件、easyui中文支持文件 -->
+<script type="text/javascript" src="/shop/easyui/jquery.min.js"></script>
+<script type="text/javascript" src="/shop/easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="/shop/easyui/locale/easyui-lang-zh_CN.js"></script>
+</head>
+<style>
+.black_overlay {
+	display: none;
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	/* z-index越大 就在上面 */
+	z-index: 1001;
+	-moz-opacity: 0.6;
+	opacity: .60;
+	filter: alpha(opacity = 60);
+}
+
+.white_content {
+	display: none;
+	position: absolute;
+	top: 25%;
+	left: 25%;
+	width: 50%;
+	height: 50%;
+	padding: 16px;
+	/*border: 16px solid orange;*/
+	background-color: white;
+	z-index: 1002;
+	overflow: auto;
+}
+</style>
+<body>
+	<h2>用户管理</h2>
+	
+	<div style="margin: 20px 0;"></div>
+	<table id="dg"
+		style="width: 700px; height: 250px"
+		data-options="rownumbers:true,singleSelect:true,pagination:true,url:'http://localhost:8080/shop/ProductWeb?m=userlist',method:'get',toolbar:'#tb'">
+		<thead>
+			<tr>
+			<!--  field 和你javaean属性一样 -->
+				<th data-options="field:'uid',width:80">用户id</th>
+				<th data-options="field:'sname',width:100">用户名</th> 
+				<th data-options="field:'spwd',width:100">密码</th> 
+				<th data-options="field:'ssex',width:100">性别</th> 
+				<th data-options="field:'sphone',width:100">电话</th> 
+			</tr>
+		</thead>
+		
+	</table>
+	
+	<!-- 搜索框 -->
+		<div id="tb">
+			名称<input type="text" name="suser" id="suser" />
+			
+			<a id="standardQueryBtn" href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-search'">搜索</a>
+		</div> 
+		<div id="light" class="white_content">
+
+		<form method="post"  action="http://localhost:8080/shop/ProductWeb?m=adduser">
+	        用户名:<input type="text" name="suser" /><br>
+	         密码:<input type="text" name="spwd" /><br>
+	           性别:<input type="text" name="ssex" /><br>
+	          电话:<input type="text" name="sphone" /><br>
+	          
+				<input type="submit" value="提交">
+		</form>
+		<button  onclick="two()">取消</button>
+	</div>
+	<div id="light1" class="white_content">
+
+		<form method="post"  action="http://localhost:8080/shop/ProductWeb?m=updateuser">
+	        用户名:<input type="text" name="suser" /><br>
+	         密码:<input type="text" name="spwd" /><br>
+	           性别:<input type="text" name="ssex" /><br>
+	          电话:<input type="text" name="sphone" /><br>
+	          
+				<input type="submit" value="提交">
+		</form>
+		<button  onclick="two()">取消1</button>
+	</div>
+	
+	<div id="fade" class="black_overlay"></div>
+	<script type="text/javascript">
+	function formatOper(val,row,index){  
+	    return '<a href="#" onclick="editUser('+index+')">修改</a>';  
+	} 
+		$(function() {
+			 
+			var pager = $('#dg').datagrid().datagrid('getPager'); // get the pager of datagrid
+			pager.pagination({
+				buttons : [ {
+					iconCls : 'icon-remove',
+					handler : function() {
+					 var row = $('#dg').datagrid('getSelected'); 
+					 $.get("http://localhost:8080/shop/ProductWeb?m=userdel", {
+							"uid" : row.uid
+						},);
+					 
+					}
+				}, {
+					iconCls : 'icon-add',
+					handler : function() {
+						one();
+						
+					}
+				}, {
+					iconCls : 'icon-edit',
+					handler : function() {
+						var row = $('#dg').datagrid('getSelected'); 
+						$('#uid').val(row.uid);
+						one1();
+					}
+				} ]
+			});
+		})
+		$("#standardQueryBtn").click(function() {
+
+				$("#dg").datagrid("load", {
+					"sname": $("#sname").val(),
+	
+				});
+				
+				
+
+			});
+		
+		function one() {
+			document.getElementById('light').style.display = 'block';
+			document.getElementById('fade').style.display = 'block'
+		}
+		function one1() {
+			document.getElementById('light1').style.display = 'block';
+			document.getElementById('fade').style.display = 'block'
+		}
+
+		function two() {
+			//先获取数据  通过 ajax提交数据 然后在让当前弹出层消失
+			$("form")[0].submit();
+			document.getElementById('light').style.display = 'none';
+			document.getElementById('fade').style.display = 'none'
+
+		}
+	</script>
+</body>
+</html>
